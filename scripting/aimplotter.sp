@@ -1,5 +1,5 @@
 #pragma semicolon 1
-//#pragma newdecls required
+#pragma newdecls required
 
 #include <sourcemod>
 #include <sdktools>
@@ -11,7 +11,7 @@ public Plugin myinfo =
     name        = "Rough Sourcemod AimPlotter",
     author      = "MitchDizzle_, steph&nie",
     description = "Show where client is aiming - for spotting cheaters!",
-    version     = "0.0.2",
+    version     = "0.0.3",
     url         = "https://sappho.io"
 }
 
@@ -243,19 +243,31 @@ public bool TraceEntityFilterPlayer(int entity, int contentsMask, int client)
         return false;
     }
 
+    // trace on the world ALWAYS
+    if (entity == 0)
+    {
+        return true;
+    }
+
     // we ran into an entity. are they a client?
     if (IsValidClientOrBot(entity))
     {
         // yeah, theyre a client. what team are they on?
-        int clientTeam = GetClientTeam(client);
-        int entTeam = GetClientTeam(entity);
+        int clientTeam  = GetClientTeam(client);
+        int entTeam     = GetClientTeam(entity);
         // are they on our team? if so, don't draw on them, keep tracing thru them!
         if (clientTeam == entTeam)
         {
             return false;
         }
+        // if they're an enemy gamer, draw on top of them!
+        else
+        {
+            return true;
+        }
     }
-    return true;
+    // don't know what this entity is - ignore it!
+    return false;
 }
 
 // is valid client stock
